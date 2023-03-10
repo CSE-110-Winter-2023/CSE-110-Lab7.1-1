@@ -6,8 +6,10 @@ import androidx.lifecycle.Observer;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class NoteRepository {
     private final NoteDao dao;
@@ -104,11 +106,27 @@ public class NoteRepository {
         // you don't create a new polling thread every time you call getRemote with the same title.
         // You don't need to worry about killing background threads.
 
-        throw new UnsupportedOperationException("Not implemented yet");
+        NoteAPI api = NoteAPI.provide();
+        MediatorLiveData<Note> lNote = new MediatorLiveData<Note>();
+
+        var executor = Executors.newSingleThreadScheduledExecutor();
+        poller = executor.scheduleAtFixedRate(() -> {
+            lNote.postValue(api.get(title));
+        }, 0, 3000, TimeUnit.MILLISECONDS);
+
+        lNote.addSource(lNote, lNote::postValue);
+        return lNote;
+
+//        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public void upsertRemote(Note note) {
         // TODO: Implement upsertRemote!
-        throw new UnsupportedOperationException("Not implemented yet");
+
+        NoteAPI api = NoteAPI.provide();
+        note.version = note.version + 1;
+        api.put(note);
+
+//        throw new UnsupportedOperationException("Not implemented yet");
     }
 }
