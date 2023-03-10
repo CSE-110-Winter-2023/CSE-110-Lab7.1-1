@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.sharednotes.model;
 
+import android.os.AsyncTask;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
@@ -122,10 +124,16 @@ public class NoteRepository {
 
     public void upsertRemote(Note note) {
         // TODO: Implement upsertRemote!
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                NoteAPI api = NoteAPI.provide();
+                note.version = note.version + 1;
+                api.put(note);
+            }
+        });
 
-        NoteAPI api = NoteAPI.provide();
-        note.version = note.version + 1;
-        api.put(note);
+
 
 //        throw new UnsupportedOperationException("Not implemented yet");
     }
