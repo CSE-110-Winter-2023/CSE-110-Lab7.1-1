@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -119,4 +120,14 @@ public class NoteAPI {
         // We can use future.get(1, SECONDS) to wait for the result.
         return future;
     }
+
+    @AnyThread
+    public Future<Note> getAsync(String msg) {
+        var executor = Executors.newSingleThreadExecutor();
+        var future = executor.submit(() -> get(msg));
+
+        // We can use future.get(1, SECONDS) to wait for the result.
+        return future;
+    }
+
 }
